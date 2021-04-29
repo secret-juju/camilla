@@ -18,7 +18,7 @@ class StockCrawler(
     private val companySearchService: CompanySearchService,
 ) {
 
-    fun stockInformationCrawling(
+    fun crawlingStockInformation(
         tickerSymbol: String,
         firstPageNumber: Int = DEFAULT_FIRST_PAGE_NUMBER,
         lastPageNumber: Int = DEFAULT_LAST_PAGE_NUMBER,
@@ -76,5 +76,38 @@ class StockCrawler(
         return StockIndex.values()
             .map { it.extractStockInformation(stockInformation) }
             .toList()
+    }
+
+    fun crawlingTodayStockInformation(companyTickerSymbol: String) {
+        val todayStock = getStockInformation(
+            tickerSymbol = companyTickerSymbol,
+            page = 1,
+            endDate = LocalDate.now(),
+            startDate = LocalDate.now(),
+        ).singleOrNull()
+
+        val refinedStock =
+            decompose(
+                todayStock
+                    .subList(21, todayStock.size - 1)
+                    .subList(0, todayStock.size - 17)
+            )
+
+        val a = Stock(
+            date = LocalDate.parse(refinedStock[StockIndex.DATE.index]),
+            closingPrice = refinedStock[StockIndex.CLOSING_PRICE.index].toLong(),
+            differenceFromYesterday = refinedStock[StockIndex.DIFFERENCE_FROM_YESTERDAY.index].toLong(),
+            fluctuationRate = refinedStock[StockIndex.FLUCTUATION_RATE.index].toDouble(),
+            openingPrice = refinedStock[StockIndex.OPENING_PRICE.index].toLong(),
+            highPrice = refinedStock[StockIndex.HIGH_PRICE.index].toLong(),
+            lowPrice = refinedStock[StockIndex.LOW_PRICE.index].toLong(),
+            company = companySearchService.getCompanyByTickerSymbol(tickerSymbol),
+        )
+
+        println(a)
+
+        stockCreationService.saveStock(
+            a
+        )
     }
 }
