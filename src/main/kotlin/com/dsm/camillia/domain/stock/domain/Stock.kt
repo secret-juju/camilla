@@ -11,23 +11,12 @@ class Stock(
     @Column(name = "date")
     val date: LocalDate,
 
-    @Column(name = "closing_price")
-    val closingPrice: Long,
-
-    @Column(name = "difference_from_yesterday")
-    val differenceFromYesterday: Long,
-
-    @Column(name = "fluctuation_rate")
-    val fluctuationRate: Double,
-
-    @Column(name = "opening_price")
-    val openingPrice: Long,
-
-    @Column(name = "high_price")
-    val highPrice: Long,
-
-    @Column(name = "low_price")
-    val lowPrice: Long,
+    closingPrice: Long,
+    differenceFromYesterday: Long,
+    fluctuationRate: Double,
+    openingPrice: Long,
+    highPrice: Long,
+    lowPrice: Long,
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
@@ -38,4 +27,44 @@ class Stock(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     var id: Long? = null
+
+    @Column(name = "closing_price")
+    var closingPrice = closingPrice
+        private set
+
+    @Column(name = "difference_from_yesterday")
+    var differenceFromYesterday = differenceFromYesterday
+        private set
+
+    @Column(name = "fluctuation_rate")
+    var fluctuationRate = fluctuationRate
+        private set
+
+    @Column(name = "opening_price")
+    var openingPrice = openingPrice
+        private set
+
+    @Column(name = "high_price")
+    var highPrice = highPrice
+        private set
+
+    @Column(name = "low_price")
+    var lowPrice = lowPrice
+        private set
+
+    fun updateStock(
+        closingPrice: Long,
+        differenceFromYesterday: Long,
+        fluctuationRate: Double,
+        openingPrice: Long,
+        highPrice: Long,
+        lowPrice: Long,
+    ) {
+        this.closingPrice = closingPrice
+        this.differenceFromYesterday = differenceFromYesterday
+        this.fluctuationRate = fluctuationRate
+        this.openingPrice = openingPrice
+        this.highPrice = highPrice
+        this.lowPrice = lowPrice
+    }
 }
