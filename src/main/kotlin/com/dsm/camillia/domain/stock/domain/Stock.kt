@@ -1,5 +1,6 @@
 package com.dsm.camillia.domain.stock.domain
 
+import com.dsm.camillia.domain.company.domain.Company
 import java.time.LocalDate
 import javax.persistence.*
 
@@ -27,6 +28,10 @@ class Stock(
 
     @Column(name = "low_price")
     val lowPrice: Long,
+
+    @ManyToOne
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    val company: Company,
 ) {
 
     @Id
