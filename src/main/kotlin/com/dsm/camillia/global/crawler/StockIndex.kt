@@ -21,6 +21,7 @@ enum class StockIndex(val index: Int) {
             .replace("&nbsp;", "")
             .replace("▼", "-")
             .replace("▲", "")
+            .replace(",", "")
             .replace(Regex("^[0-9]{2}/[0-9]{2}/[0-9]{2}$")) {
                 "${LocalDate.now().year / 100}${it.value.replace("/", "-")}"
             }
