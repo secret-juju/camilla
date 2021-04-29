@@ -1,4 +1,4 @@
-package com.dsm.camillia.domain
+package com.dsm.camillia.domain.stock.domain
 
 import java.time.LocalDate
 import javax.persistence.*
