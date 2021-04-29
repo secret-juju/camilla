@@ -1,5 +1,6 @@
 package com.dsm.camillia.global.crawler
 
+import com.dsm.camillia.domain.company.service.CompanySearchService
 import com.dsm.camillia.domain.stock.domain.Stock
 import com.dsm.camillia.domain.stock.service.StockCreationService
 import org.jsoup.Jsoup
@@ -14,6 +15,7 @@ private const val CRAWLING_TARGET_URL = "https://vip.mk.co.kr/newSt/price/daily.
 @Component
 class StockCrawler(
     private val stockCreationService: StockCreationService,
+    private val companySearchService: CompanySearchService,
 ) {
 
     fun stockInformationCrawling(
@@ -37,12 +39,13 @@ class StockCrawler(
                 .map {
                     Stock(
                         date = LocalDate.parse(it[StockIndex.DATE.index]),
-                        closingPrice = it[StockIndex.DATE.index].toLong(),
+                        closingPrice = it[StockIndex.CLOSING_PRICE.index].toLong(),
                         differenceFromYesterday = it[StockIndex.DIFFERENCE_FROM_YESTERDAY.index].toLong(),
                         fluctuationRate = it[StockIndex.FLUCTUATION_RATE.index].toDouble(),
                         openingPrice = it[StockIndex.OPENING_PRICE.index].toLong(),
                         highPrice = it[StockIndex.HIGH_PRICE.index].toLong(),
                         lowPrice = it[StockIndex.LOW_PRICE.index].toLong(),
+                        company = companySearchService.getCompanyByTickerSymbol(tickerSymbol),
                     )
                 }
                 .toList()
