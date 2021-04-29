@@ -1,4 +1,6 @@
 package com.dsm.camillia.global.exception.response
 
-class ExceptionResponse {
-}
+data class ExceptionResponse(
+    val code: String,
+    val message: String,
+)
