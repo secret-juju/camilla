@@ -1,4 +1,5 @@
 package com.dsm.camillia.domain.stock.controller.request
 
-class StockInitializationRequest {
-}
+data class StockInitializationRequest(
+    val tickerSymbol: List<String>
+)
