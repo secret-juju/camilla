@@ -2,6 +2,7 @@ package com.dsm.camillia.domain.stock.controller
 
 import com.dsm.camillia.domain.stock.controller.request.StockInitializationRequest
 import com.dsm.camillia.global.crawler.StockCrawler
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -19,7 +20,12 @@ class StockController(
         request: StockInitializationRequest,
     ) {
         request.tickerSymbol.forEach {
-            stockCrawler.stockInformationCrawling(it)
+            stockCrawler.crawlingStockInformation(it)
         }
+    }
+
+    @GetMapping("/")
+    fun test() {
+        stockCrawler.crawlingTodayStockInformation("005930")
     }
 }
