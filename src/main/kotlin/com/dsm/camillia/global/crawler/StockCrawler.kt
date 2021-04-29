@@ -66,9 +66,7 @@ class StockCrawler(
                 "&y2=${endDate.year}" +
                 "&m2=${String.format("%02d", endDate.monthValue)}" +
                 "&d2=${String.format("%02d", endDate.dayOfMonth)}"
-    ).get().body()
-        .getElementsByTag("tr")
-        .toList()
+    ).get().body().getElementsByTag("tr").toList()
 
     private fun decompose(element: Element): List<String> {
         val stockInformation = element.getElementsByTag("td")
