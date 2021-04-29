@@ -1,7 +1,7 @@
-package com.dsm.camillia.service
+package com.dsm.camillia.domain.stock.service
 
-import com.dsm.camillia.domain.Stock
-import com.dsm.camillia.repository.StockRepository
+import com.dsm.camillia.domain.stock.domain.Stock
+import com.dsm.camillia.domain.stock.repository.StockRepository
 import org.springframework.stereotype.Service
 
 @Service
