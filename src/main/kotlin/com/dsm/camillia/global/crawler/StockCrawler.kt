@@ -3,6 +3,7 @@ package com.dsm.camillia.global.crawler
 import com.dsm.camillia.domain.company.service.CompanySearchService
 import com.dsm.camillia.domain.stock.domain.Stock
 import com.dsm.camillia.domain.stock.service.StockCreationService
+import com.dsm.camillia.domain.stock.service.StockModificationService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.springframework.stereotype.Component
@@ -15,6 +16,7 @@ private const val CRAWLING_TARGET_URL = "https://vip.mk.co.kr/newSt/price/daily.
 @Component
 class StockCrawler(
     private val stockCreationService: StockCreationService,
+    private val stockModificationService: StockModificationService,
     private val companySearchService: CompanySearchService,
 ) {
 
@@ -37,18 +39,30 @@ class StockCrawler(
                 .flatten()
                 .map { decompose(it) }
                 .map {
-                    Stock(
-                        date = LocalDate.parse(it[StockIndex.DATE.index]),
-                        closingPrice = it[StockIndex.CLOSING_PRICE.index].toLong(),
-                        differenceFromYesterday = it[StockIndex.DIFFERENCE_FROM_YESTERDAY.index].toLong(),
-                        fluctuationRate = it[StockIndex.FLUCTUATION_RATE.index].toDouble(),
-                        openingPrice = it[StockIndex.OPENING_PRICE.index].toLong(),
-                        highPrice = it[StockIndex.HIGH_PRICE.index].toLong(),
-                        lowPrice = it[StockIndex.LOW_PRICE.index].toLong(),
-                        company = companySearchService.getCompanyByTickerSymbol(tickerSymbol),
+                    createStock(
+                        stockInformation = it,
+                        tickerSymbol = tickerSymbol,
                     )
                 }
                 .toList()
+        )
+    }
+
+    fun crawlingTodayStockInformation(companyTickerSymbol: String) {
+        val refinedStock = decompose(
+            getStockInformation(
+                tickerSymbol = companyTickerSymbol,
+                page = 1,
+                endDate = LocalDate.now(),
+                startDate = LocalDate.now(),
+            )[21]
+        )
+
+        stockModificationService.modifyStock(
+            createStock(
+                stockInformation = refinedStock,
+                tickerSymbol = companyTickerSymbol,
+            )
         )
     }
 
@@ -78,36 +92,15 @@ class StockCrawler(
             .toList()
     }
 
-    fun crawlingTodayStockInformation(companyTickerSymbol: String) {
-        val todayStock = getStockInformation(
-            tickerSymbol = companyTickerSymbol,
-            page = 1,
-            endDate = LocalDate.now(),
-            startDate = LocalDate.now(),
-        ).singleOrNull()
-
-        val refinedStock =
-            decompose(
-                todayStock
-                    .subList(21, todayStock.size - 1)
-                    .subList(0, todayStock.size - 17)
-            )
-
-        val a = Stock(
-            date = LocalDate.parse(refinedStock[StockIndex.DATE.index]),
-            closingPrice = refinedStock[StockIndex.CLOSING_PRICE.index].toLong(),
-            differenceFromYesterday = refinedStock[StockIndex.DIFFERENCE_FROM_YESTERDAY.index].toLong(),
-            fluctuationRate = refinedStock[StockIndex.FLUCTUATION_RATE.index].toDouble(),
-            openingPrice = refinedStock[StockIndex.OPENING_PRICE.index].toLong(),
-            highPrice = refinedStock[StockIndex.HIGH_PRICE.index].toLong(),
-            lowPrice = refinedStock[StockIndex.LOW_PRICE.index].toLong(),
+    private fun createStock(stockInformation: List<String>, tickerSymbol: String) =
+        Stock(
+            date = LocalDate.parse(stockInformation[StockIndex.DATE.index]),
+            closingPrice = stockInformation[StockIndex.CLOSING_PRICE.index].toLong(),
+            differenceFromYesterday = stockInformation[StockIndex.DIFFERENCE_FROM_YESTERDAY.index].toLong(),
+            fluctuationRate = stockInformation[StockIndex.FLUCTUATION_RATE.index].toDouble(),
+            openingPrice = stockInformation[StockIndex.OPENING_PRICE.index].toLong(),
+            highPrice = stockInformation[StockIndex.HIGH_PRICE.index].toLong(),
+            lowPrice = stockInformation[StockIndex.LOW_PRICE.index].toLong(),
             company = companySearchService.getCompanyByTickerSymbol(tickerSymbol),
         )
-
-        println(a)
-
-        stockCreationService.saveStock(
-            a
-        )
-    }
 }
