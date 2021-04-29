@@ -1,4 +1,4 @@
-package com.dsm.camillia.crawler
+package com.dsm.camillia.global.crawler
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
