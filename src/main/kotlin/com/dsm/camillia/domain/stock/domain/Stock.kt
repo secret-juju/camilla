@@ -6,16 +6,31 @@ import javax.persistence.*
 @Entity
 @Table(name = "stock")
 class Stock(
+
+    @Column(name = "date")
     val date: LocalDate,
+
+    @Column(name = "closing_price")
     val closingPrice: Long,
+
+    @Column(name = "difference_from_yesterday")
     val differenceFromYesterday: Long,
+
+    @Column(name = "fluctuation_rate")
     val fluctuationRate: Double,
+
+    @Column(name = "opening_price")
     val openingPrice: Long,
+
+    @Column(name = "high_price")
     val highPrice: Long,
+
+    @Column(name = "low_price")
     val lowPrice: Long,
 ) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     var id: Long? = null
 }
