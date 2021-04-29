@@ -1,5 +1,7 @@
 package com.dsm.camillia.global.crawler
 
+import com.dsm.camillia.domain.stock.domain.Stock
+import com.dsm.camillia.domain.stock.service.StockCreationService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.springframework.stereotype.Component
@@ -10,26 +12,41 @@ private const val DEFAULT_LAST_PAGE_NUMBER = 7
 private const val CRAWLING_TARGET_URL = "https://vip.mk.co.kr/newSt/price/daily.php"
 
 @Component
-class StockCrawler {
+class StockCrawler(
+    private val stockCreationService: StockCreationService,
+) {
 
     fun stockInformationCrawling(
         tickerSymbol: String,
         firstPageNumber: Int = DEFAULT_FIRST_PAGE_NUMBER,
         lastPageNumber: Int = DEFAULT_LAST_PAGE_NUMBER,
     ) {
-        (firstPageNumber..lastPageNumber)
-            .asSequence()
-            .map {
-                getStockInformation(
-                    tickerSymbol = tickerSymbol,
-                    page = it,
-                )
-            }
-            .map { it.subList(21, it.size - 1) }
-            .map { it.subList(0, it.size - 17) }
-            .flatten()
-            .map { decompose(it) }
-            .toList()
+        stockCreationService.saveAllStock(
+            (firstPageNumber..lastPageNumber)
+                .asSequence()
+                .map {
+                    getStockInformation(
+                        tickerSymbol = tickerSymbol,
+                        page = it,
+                    )
+                }
+                .map { it.subList(21, it.size - 1) }
+                .map { it.subList(0, it.size - 17) }
+                .flatten()
+                .map { decompose(it) }
+                .map {
+                    Stock(
+                        date = LocalDate.parse(it[StockIndex.DATE.index]),
+                        closingPrice = it[StockIndex.DATE.index].toLong(),
+                        differenceFromYesterday = it[StockIndex.DIFFERENCE_FROM_YESTERDAY.index].toLong(),
+                        fluctuationRate = it[StockIndex.FLUCTUATION_RATE.index].toDouble(),
+                        openingPrice = it[StockIndex.OPENING_PRICE.index].toLong(),
+                        highPrice = it[StockIndex.HIGH_PRICE.index].toLong(),
+                        lowPrice = it[StockIndex.LOW_PRICE.index].toLong(),
+                    )
+                }
+                .toList()
+        )
     }
 
     private fun getStockInformation(
