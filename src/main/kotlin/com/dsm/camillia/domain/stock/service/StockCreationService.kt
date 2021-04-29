@@ -6,8 +6,12 @@ import org.springframework.stereotype.Service
 
 @Service
 class StockCreationService(
-    val stockRepository: StockRepository,
+    private val stockRepository: StockRepository,
 ) {
+
+    fun saveStock(stock: Stock) {
+        stockRepository.save(stock)
+    }
 
     fun saveAllStock(stocks: List<Stock>) {
         stockRepository.saveAll(stocks)
