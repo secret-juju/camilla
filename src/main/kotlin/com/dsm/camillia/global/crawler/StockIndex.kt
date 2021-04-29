@@ -3,7 +3,7 @@ package com.dsm.camillia.global.crawler
 import org.jsoup.select.Elements
 import java.time.LocalDate
 
-enum class StockIndex(private val index: Int) {
+enum class StockIndex(val index: Int) {
     DATE(0),
     CLOSING_PRICE(1),
     DIFFERENCE_FROM_YESTERDAY(2),
