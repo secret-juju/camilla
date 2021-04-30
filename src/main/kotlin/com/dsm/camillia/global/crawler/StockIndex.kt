@@ -10,7 +10,9 @@ enum class StockIndex(val index: Int) {
     FLUCTUATION_RATE(3),
     OPENING_PRICE(4),
     HIGH_PRICE(5),
-    LOW_PRICE(6);
+    LOW_PRICE(6),
+    MARKET_CAPITALIZATION(7);
+    
 
     fun extractStockInformation(elements: Elements) =
         elements[this.index].html()
