@@ -11,7 +11,10 @@ import java.time.LocalDate
 
 private const val DEFAULT_FIRST_PAGE_NUMBER = 1
 private const val DEFAULT_LAST_PAGE_NUMBER = 7
-private const val CRAWLING_TARGET_URL = "https://vip.mk.co.kr/newSt/price/daily.php"
+private const val MAIN_CRAWLING_TARGET_URL =
+    "https://vip.mk.co.kr/newSt/price/daily.php"
+private const val MARKET_CAPITALIZATION_CRAWLING_TARGET_URL =
+    "https://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&cID=&MenuYn=Y&ReportGB=&NewMenuID=101&stkGb=701&gicode=A"
 
 @Component
 class StockCrawler(
@@ -25,6 +28,7 @@ class StockCrawler(
         firstPageNumber: Int = DEFAULT_FIRST_PAGE_NUMBER,
         lastPageNumber: Int = DEFAULT_LAST_PAGE_NUMBER,
     ) {
+        val marketCapitalization = getMarketCapitalization(tickerSymbol)
         stockCreationService.saveAllStock(
             (firstPageNumber..lastPageNumber)
                 .asSequence()
@@ -37,7 +41,11 @@ class StockCrawler(
                 .map { it.subList(21, it.size - 1) }
                 .map { it.subList(0, it.size - 17) }
                 .flatten()
-                .map { decompose(it) }
+                .map {
+                    val decomposedStock = decompose(it).toMutableList()
+                    decomposedStock.add(marketCapitalization)
+                    decomposedStock
+                }
                 .map {
                     createStock(
                         stockInformation = it,
@@ -56,7 +64,8 @@ class StockCrawler(
                 endDate = LocalDate.now(),
                 startDate = LocalDate.now(),
             )[21]
-        )
+        ).toMutableList()
+        refinedStock.add(getMarketCapitalization(companyTickerSymbol))
 
         stockModificationService.modifyStock(
             createStock(
@@ -74,7 +83,7 @@ class StockCrawler(
             if (endDate.dayOfYear < 365) LocalDate.ofYearDay(endDate.year - 1, endDate.dayOfYear + 1)
             else LocalDate.ofYearDay(endDate.year, 1)
     ) = Jsoup.connect(
-        CRAWLING_TARGET_URL +
+        MAIN_CRAWLING_TARGET_URL +
                 "?stCode=$tickerSymbol" +
                 "&p_page=$page" +
                 "&y1=${startDate.year}" +
@@ -88,6 +97,7 @@ class StockCrawler(
     private fun decompose(element: Element): List<String> {
         val stockInformation = element.getElementsByTag("td")
         return StockIndex.values()
+            .filter { it.index < 7 }
             .map { it.extractStockInformation(stockInformation) }
             .toList()
     }
@@ -101,6 +111,19 @@ class StockCrawler(
             openingPrice = stockInformation[StockIndex.OPENING_PRICE.index].toLong(),
             highPrice = stockInformation[StockIndex.HIGH_PRICE.index].toLong(),
             lowPrice = stockInformation[StockIndex.LOW_PRICE.index].toLong(),
+            marketCapitalization = stockInformation[StockIndex.MARKET_CAPITALIZATION.index].toLong(),
             company = companySearchService.getCompanyByTickerSymbol(tickerSymbol),
         )
+
+    private fun getMarketCapitalization(companyTickerSymbol: String) =
+        Jsoup.connect(MARKET_CAPITALIZATION_CRAWLING_TARGET_URL + companyTickerSymbol)
+            .get()
+            .body()
+            .getElementsByTag("td")
+            .filter { it.hasClass("r") }
+            .elementAt(6)
+            .toString()
+            .replace("<td class=\"r\">", "")
+            .replace("</td>", "")
+            .replace(",", "")
 }

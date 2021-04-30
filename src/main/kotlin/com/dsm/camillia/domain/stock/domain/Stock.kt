@@ -17,6 +17,7 @@ class Stock(
     openingPrice: Long,
     highPrice: Long,
     lowPrice: Long,
+    marketCapitalization: Long,
 
     @ManyToOne
     @JoinColumn(name = "company_id", referencedColumnName = "id")
@@ -50,6 +51,10 @@ class Stock(
 
     @Column(name = "low_price")
     var lowPrice = lowPrice
+        private set
+
+    @Column(name = "market_capitalization")
+    var marketCapitalization = marketCapitalization
         private set
 
     fun updateStock(
