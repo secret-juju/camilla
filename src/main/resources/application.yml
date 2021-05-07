@@ -9,9 +9,11 @@ spring:
       enabled: always
   datasource:
     driver-class-name: ${DATABASE_DRIVER:com.mysql.cj.jdbc.Driver}
-    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/secret_juju?serverTimezone=Asia/Seoul}
+#    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/secret_juju?serverTimezone=Asia/Seoul}
+    url: ${DATABASE_URL:jdbc:mysql://database.dsm-cms.com/secret_juju?serverTimezone=Asia/Seoul}
     username: ${DATABASE_USERNAME:root}
-    password: ${DATABASE_PASSWORD:1111}
+#    password: ${DATABASE_PASSWORD:1111}
+    password: ${DATABASE_PASSWORD:Fvf.qy)gGmbEa3</}
 server:
   address: 0.0.0.0
   port: 5190
