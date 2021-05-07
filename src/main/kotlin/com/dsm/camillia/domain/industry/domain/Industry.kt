@@ -9,10 +9,6 @@ class Industry(
 
     @Column(name = "name")
     val name: String,
-
-    @ManyToOne
-    @JoinColumn(name = "company_id", referencedColumnName = "id")
-    val company: Company,
 ) {
 
     @Id
