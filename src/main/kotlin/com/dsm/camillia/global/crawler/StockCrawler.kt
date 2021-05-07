@@ -124,6 +124,7 @@ class StockCrawler(
             .elementAt(6)
             .toString()
             .replace("<td class=\"r\">", "")
+            .replace("<strong class=\"arrow_bold\" title=\"상한\">↑</strong>", "")
             .replace("</td>", "")
             .replace(",", "")
 }
