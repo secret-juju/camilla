@@ -16,7 +16,7 @@ class StockScheduler(
     private val companySearchService: CompanySearchService,
 ) {
 
-    @Scheduled(cron = "1 0/5 9-4 * * MON-FRI")
+    @Scheduled(cron = "1 0/5 9-16 * * MON-FRI")
     fun createTodayStock() {
         log.info("[${LocalDateTime.now()}] 스케줄러 동작")
         val companyTickerSymbols = companySearchService.getAllCompany()
