@@ -49,6 +49,6 @@ jobs:
       - name: upload to docker hub
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: 0816jinjin/camillia
+          name: 0816jinjin/camillia:latest
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
